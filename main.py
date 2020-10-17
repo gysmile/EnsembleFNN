@@ -1,11 +1,8 @@
-import torch
 import numpy as np
 import matplotlib.pyplot as plt
 
 from torchvision.datasets import MNIST
-from torchvision import transforms
 from model import *
-
 from tqdm import tqdm
 
 # device = 'cpu'  # cpu
@@ -86,11 +83,11 @@ for iter in tqdm(range(training_iter)):
 ensemblefnn_test_loss = []
 ensemblefnn_test_loss_ind = [[] for ii in range(num_nets)]
 for iter in tqdm(range(training_iter)):
-    # idx = np.random.choice(X.shape[0], batch_size)  # all nets use sample mini batch
+    # idx = np.random.choice(X.shape[0], batch_size)  # all nets use the same mini batch
     idx = np.random.choice(X.shape[0], (batch_size, num_nets))  # different mini batch for different nets
     output = ensemblefnn(X[idx, :])
-    # loss = criterion(torch.mean(output, dim=1), Y[idx])
-    loss = criterion(output.contiguous().view(-1, num_classes), Y[idx].view(-1))
+    # loss = criterion(torch.mean(output, dim=1), Y[idx])  # all nets use the same mini batch
+    loss = criterion(output.contiguous().view(-1, num_classes), Y[idx].view(-1))  # different mini batch for diff nets
     optimizer_efnn.zero_grad()
     loss.backward()
     optimizer_efnn.step()
